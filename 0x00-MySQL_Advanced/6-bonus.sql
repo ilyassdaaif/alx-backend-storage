@@ -8,14 +8,14 @@ CREATE PROCEDURE AddBonus(
 BEGIN
     DECLARE project_id INT;
 
-    -- check if the project already exists, if not, create it
-    SELECT id INTO project_id    
+    -- Check if the project already exists, if not, create it
+    SELECT id INTO project_id
     FROM projects
     WHERE name = project_name;
 
     IF project_id IS NULL THEN
-	INSERT INTO projects (name) VALUES (project_name);
-	SET project_id = LAST_INSERT_ID();
+        INSERT INTO projects (name) VALUES (project_name);
+        SET project_id = LAST_INSERT_ID();
     END IF;
 
     -- Insert the new correction
@@ -25,11 +25,11 @@ BEGIN
     -- Update the user's average score
     UPDATE users
     SET average_score = (
-	SELECT AVG(score)
-	FROM corrections
-	WHERE user_id = AddBonus.user_id
+        SELECT AVG(score)
+        FROM corrections
+        WHERE user_id = AddBonus.user_id
     )
     WHERE id = AddBonus.user_id;
 END//
-	
+
 DELIMITER ;
