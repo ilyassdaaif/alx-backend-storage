@@ -1,5 +1,4 @@
--- Create a stored procedure AddBonus that adds a new
--- correction for a student
+-- Create the AddBonus stored procedure
 DELIMITER //
 
 CREATE PROCEDURE AddBonus(
@@ -9,6 +8,11 @@ CREATE PROCEDURE AddBonus(
 )
 BEGIN
     DECLARE project_id INT;
+
+    -- Check if the user exists
+    IF (SELECT COUNT(*) FROM users WHERE id = user_id) = 0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'User does not exist';
+    END IF;
 
     -- Check if the project already exists, if not, create it
     SELECT id INTO project_id
@@ -24,15 +28,14 @@ BEGIN
     INSERT INTO corrections (user_id, project_id, score)
     VALUES (user_id, project_id, score);
 
-    -- Check if the user exists before updating the average score
-    IF (SELECT COUNT(*) FROM users WHERE id = AddBonus.user_id) > 0 THEN
-    	UPDATE users
-    	SET average_score = (
-            SELECT AVG(score)
-	    FROM corrections
-      	    WHERE user_id = AddBonus.user_id
-	)
-        WHERE id = AddBonus.user_id;
-END IF;
+    -- Update the user's average score
+    UPDATE users
+    SET average_score = (
+        SELECT AVG(score)
+        FROM corrections
+        WHERE user_id = AddBonus.user_id
+    )
+    WHERE id = AddBonus.user_id;
+END//
 
 DELIMITER ;
