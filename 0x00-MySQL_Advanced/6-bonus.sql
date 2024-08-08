@@ -24,14 +24,15 @@ BEGIN
     INSERT INTO corrections (user_id, project_id, score)
     VALUES (user_id, project_id, score);
 
-    -- Update the user's average score
-    UPDATE users
-    SET average_score = (
-        SELECT AVG(score)
-        FROM corrections
-        WHERE user_id = AddBonus.user_id
-    )
-    WHERE id = AddBonus.user_id;
-END//
+    -- Check if the user exists before updating the average score
+    IF (SELECT COUNT(*) FROM users WHERE id = AddBonus.user_id) > 0 THEN
+    	UPDATE users
+    	SET average_score = (
+            SELECT AVG(score)
+	    FROM corrections
+      	    WHERE user_id = AddBonus.user_id
+	)
+        WHERE id = AddBonus.user_id;
+END IF;
 
 DELIMITER ;
