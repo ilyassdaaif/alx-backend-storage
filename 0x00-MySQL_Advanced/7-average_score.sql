@@ -9,9 +9,9 @@ BEGIN
     DECLARE avg_score FLOAT;
 
     -- Calculate the average score for the specified user
-    SELECT AVG(score) INTO avg_score
+    SELECT COALESCE(AVG(score), 0) INTO avg_score
     FROM corrections
-    WHERE user_id = user_id;
+    WHERE corrections.user_id = user_id;
 
     -- Update the user's average_score in the users table
     UPDATE users
