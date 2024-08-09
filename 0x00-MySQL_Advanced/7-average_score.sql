@@ -1,22 +1,20 @@
--- Drop the procedure if it already exists
-DROP PROCEDURE IF EXISTS ComputeAverageScoreForUser;
-
 DELIMITER //
 
--- Create the ComputeAverageScoreForUser procedure
-CREATE PROCEDURE ComputeAverageScoreForUser(IN user_id INT)
+CREATE PROCEDURE ComputeAverageScoreForUser(
+    IN user_id INT
+)
 BEGIN
     DECLARE avg_score FLOAT;
 
-    -- Calculate the average score for the specified user
+    -- Compute the average score
     SELECT AVG(score) INTO avg_score
     FROM corrections
-    WHERE user_id = user_id;
+    WHERE corrections.user_id = user_id;
 
-    -- Update the user's average_score in the users table
+    -- Update the user's average_score
     UPDATE users
-    SET average_score = avg_score
+    SET average_score = IFNULL(avg_score, 0)
     WHERE id = user_id;
-END //
+END//
 
 DELIMITER ;
