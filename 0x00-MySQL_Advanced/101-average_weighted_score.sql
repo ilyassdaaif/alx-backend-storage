@@ -1,4 +1,5 @@
--- Create a stored procedure ComputeAverageWeightedScoreForUsers that computes and store the average weighted score for all students
+-- Create a stored procedure ComputeAverageWeightedScoreForUsers that computes
+-- and store the average weighted score for all students
 DELIMITER //
 
 CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
@@ -11,14 +12,14 @@ BEGIN
     OPEN cur;
 
     read_loop: LOOP
-	FETCH cur INTO current_user_id;
+        FETCH cur INTO current_user_id;
 
-	IF done THEN
-	    LEAVE read_loop;
-	END IF;
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
 
-	-- Call the procedure to compute the average score for the current user
-	CALL ComputeAverageWeightedScoreForUser(current_user_id);
+        -- Call the procedure to compute the average score for the current user
+        CALL ComputeAverageWeightedScoreForUser(current_user_id);
     END LOOP;
 
     CLOSE cur;
