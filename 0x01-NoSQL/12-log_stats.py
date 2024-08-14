@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Provides some stats about Nginx logs stored in MongoDB."""
+"""Provides some stats about Nginx logs stored in MongoDB"""
 from pymongo import MongoClient
 
 
@@ -15,19 +15,16 @@ def log_stats():
 
     # Count the number of logs for each method
     methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-    method_counts = {method: collection.count_documents(
-        {"method": method}) for method in methods}
+    print(f"{total_logs} logs")
+    print("Methods:")
+    for method in methods:
+        method_count = collection.count_documents({"method": method})
+        print(f"\tmethod {method}: {method_count}")
 
     # Count the number of logs where the method
     # is "GET" and the path is "/status"
     status_check = collection.count_documents(
             {"method": "GET", "path": "/status"})
-
-    # Print the stats
-    print(f"{total_logs} logs")
-    print("Methods:")
-    for method in methods:
-        print(f"\tmethod {method}: {method_counts[method]}")
     print(f"{status_check} status check")
 
 
