@@ -9,7 +9,6 @@ import uuid
 from typing import Union, Callable, Optional
 import functools
 
-
 def count_calls(method: Callable) -> Callable:
     """
     Decorator to count the number of times a method is called.
@@ -17,23 +16,18 @@ def count_calls(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         """
-        Wrapper function that increments the count
-        and calls the original method.
+        Wrapper function that increments the count and calls the original method.
         """
-        # Increment the count using the method's qualified nale
         key = method.__qualname__
-        self._redis.incr(key)
-        # Call the original method and return its result
-        return method(self, *args, **kwargs)
-
+        self._redis.incr(key)  # Increment the count in Redis
+        return method(self, *args, **kwargs)  # Call the original method
+    
     return wrapper
-
 
 class Cache:
     """
     Cache class for storing and retrieving data in Redis.
     """
-
     def __init__(self):
         """
         Initialize the Redis client and flush the database.
@@ -50,8 +44,7 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[
-            str, bytes, int, float, None]:
+    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
         """
         Retrieve data from Redis and optionally convert it using fn.
         """
