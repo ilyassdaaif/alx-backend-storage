@@ -17,7 +17,8 @@ def count_calls(method: Callable) -> Callable:
     @functools.wraps(method)
     def wrapper(self, *args, **kwargs):
         """
-        Wrapper function that increments the count and calls the original method.
+        Wrapper function that increments the count
+        and calls the original method.
         """
         # Increment the count using the method's qualified nale
         key = method.__qualname__
@@ -26,6 +27,7 @@ def count_calls(method: Callable) -> Callable:
         return method(self, *args, **kwargs)
 
     return wrapper
+
 
 class Cache:
     """
@@ -48,7 +50,8 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
+    def get(self, key: str, fn: Optional[Callable] = None)
+    -> Union[str, bytes, int, float, None]:
         """
         Retrieve data from Redis and optionally convert it using fn.
         """
