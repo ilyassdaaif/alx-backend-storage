@@ -8,13 +8,11 @@ from typing import Callable
 # Redis connection setup
 redis_client = redis.Redis(host='localhost', port=6379, db=0)
 
-
 def get_page(url: str) -> str:
-    """Fetches the HTML content of a URL and
-    caches it with an expiration time."""
+    """Fetches the HTML content of a URL and caches it with an expiration time."""
     # Check if the URL is in the cache
     cached_page = redis_client.get(url)
-
+    
     if cached_page:
         # If cached, return the cached content
         print("Cache hit")
@@ -33,7 +31,6 @@ def get_page(url: str) -> str:
 
     return html_content
 
-
 def cache_page(func: Callable) -> Callable:
     """Decorator to cache and track URL accesses."""
     @functools.wraps(func)
@@ -43,7 +40,7 @@ def cache_page(func: Callable) -> Callable:
 
         # Check if the URL is in the cache
         cached_page = redis_client.get(redis_key)
-
+        
         if cached_page:
             print("Cache hit")
             redis_client.incr(count_key)
@@ -53,8 +50,7 @@ def cache_page(func: Callable) -> Callable:
         print("Cache miss")
         html_content = func(url, *args, **kwargs)
 
-        # Store the page content in the cache with
-        # an expiration time of 10 seconds
+        # Store the page content in the cache with an expiration time of 10 seconds
         redis_client.setex(redis_key, 10, html_content)
 
         # Track the number of accesses for the URL
@@ -71,14 +67,13 @@ def fetch_page(url: str) -> str:
     response = requests.get(url)
     return response.text
 
-
 if __name__ == "__main__":
-    # Testing the get_page function
+    # Testing the fetch_page function
     url = (
         "http://slowwly.robertomurray.co.uk/delay/5000/url/"
         "http://www.google.com"
     )
-
+    
     # Fetch the page content
     content = fetch_page(url)
     print(content[:100])  # Print the first 100 characters for brevity
