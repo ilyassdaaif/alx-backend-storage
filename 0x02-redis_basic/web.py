@@ -11,12 +11,11 @@ from typing import Callable
 # Initialize Redis client
 redis_client = redis.Redis()
 
-def url_count(method: Callable) -> Callable:
-    """Decorator to count how many times a URL is accessed"""
+def count_calls(method: Callable) -> Callable:
+    """Decorator to count how many times a method is called"""
     @wraps(method)
-    def wrapper(url: str) -> str:
+    def wrapper(url):
         """Wrapper function"""
-        # Increment the count for this URL
         redis_client.incr(f"count:{url}")
         return method(url)
     return wrapper
@@ -25,54 +24,36 @@ def cache_with_expiration(expiration: int = 10) -> Callable:
     """Decorator to cache the result with an expiration time"""
     def decorator(method: Callable) -> Callable:
         @wraps(method)
-        def wrapper(url: str) -> str:
+        def wrapper(url):
             """Wrapper function"""
-            # Check if the result is already in cache
             cached_result = redis_client.get(f"cached:{url}")
             if cached_result:
                 return cached_result.decode('utf-8')
-
-            # If not in cache, call the method
+            
             result = method(url)
-
-            # Cache the result with expiration
             redis_client.setex(f"cached:{url}", expiration, result)
-
             return result
         return wrapper
     return decorator
 
-@url_count
-@cache_with_expiration(10)
+@count_calls
+@cache_with_expiration()
 def get_page(url: str) -> str:
     """
     Get the HTML content of a URL
     Track how many times the URL was accessed
     Cache the result with an expiration time of 10 seconds
     """
-    try:
-        response = requests.get(url, timeout=5)
-        response.raise_for_status()  # Raise an exception for bad status codes
-        return response.text
-    except requests.RequestException as e:
-        return f"Error fetching {url}: {str(e)}"
+    response = requests.get(url)
+    return response.text
 
 if __name__ == "__main__":
-    # Example usage with a more reliable URL
-    url = "https://www.example.com"
+    url = "http://slowwly.robertomurray.co.uk/delay/1000/url/https://www.example.com"
     
-    print("First call:")
+    # First call
     print(get_page(url))
-    print(f"Page visits: {redis_client.get(f'count:{url}').decode('utf-8')}")
+    print(f"Count: {redis_client.get(f'count:{url}').decode('utf-8')}")
     
-    print("\nSecond call (should be cached):")
+    # Second call (should be cached)
     print(get_page(url))
-    print(f"Page visits: {redis_client.get(f'count:{url}').decode('utf-8')}")
-    
-    print("\nWait 10 seconds for cache to expire...")
-    import time
-    time.sleep(11)
-    
-    print("\nThird call (cache should have expired):")
-    print(get_page(url))
-    print(f"Page visits: {redis_client.get(f'count:{url}').decode('utf-8')}")
+    print(f"Count: {redis_client.get(f'count:{url}').decode('utf-8')}")
