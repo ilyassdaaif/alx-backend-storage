@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-<<<<<<< HEAD
 '''A module for using the Redis NoSQL data storage.
 '''
 import uuid
@@ -69,7 +68,6 @@ class Cache:
     '''
     def __init__(self) -> None:
         '''Initializes a Cache instance.
-=======
 
 from typing import Callable, Optional, Union
 from uuid import uuid4
@@ -143,7 +141,6 @@ class Cache:
     def __init__(self):
         '''
             Initialize the cache.
->>>>>>> a9fb20767c19b9f2a3a3535b74e1806b66e61d64
         '''
         self._redis = redis.Redis()
         self._redis.flushdb(True)
@@ -151,7 +148,6 @@ class Cache:
     @count_calls
     @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
-<<<<<<< HEAD
         '''Stores a value in a Redis data storage and returns the key.
         '''
         data_key = str(uuid.uuid4())
@@ -177,7 +173,6 @@ class Cache:
         '''Retrieves an integer value from a Redis data storage.
         '''
         return self.get(key, lambda x: int(x))
-=======
         '''
             Store data in the cache.
         '''
@@ -212,4 +207,3 @@ class Cache:
         except Exception:
             value = 0
         return value
->>>>>>> a9fb20767c19b9f2a3a3535b74e1806b66e61d64
