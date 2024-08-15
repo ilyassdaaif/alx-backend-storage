@@ -1,39 +1,34 @@
 #!/usr/bin/env python3
-"""Adding the top 10 of the most present IPs in the
-collection nginx of the database logs"""
+"""
+Python script that provides stats about Nginx logs stored in MongoDB
+"""
+
 from pymongo import MongoClient
 
 
 def log_stats():
+    """
+    Provides stats about Nginx logs stored in MongoDB
+    """
     client = MongoClient('mongodb://127.0.0.1:27017')
-    db = client.logs
-    collection = db.nginx
+    logs_collection = client.logs.nginx
 
     # Total number of logs
-    total_logs = collection.count_documents({})
+    total_logs = logs_collection.count_documents({})
     print(f"{total_logs} logs")
 
-    # Methods count
-    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
+    # Methods stats
     print("Methods:")
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
     for method in methods:
-        count = collection.count_documents({"method": method})
-        print(f"\tmethod {method}: {count}")
+        count = logs_collection.count_documents({"method": method})
+        print(f"    method {method}: {count}")
 
     # Status check
-    status_check_count = collection.count_documents({"path": "/status"})
-    print(f"{status_check_count} status check")
-
-    # Top 10 IPs
-    pipeline = [
-        {"$group": {"_id": "$ip", "count": {"$sum": 1}}},
-        {"$sort": {"count": -1}},
-        {"$limit": 10}
-    ]
-    top_ips = collection.aggregate(pipeline)
-    print("IPs:")
-    for ip in top_ips:
-        print(f"\t{ip['_id']}: {ip['count']}")
+    status_check = logs_collection.count_documents(
+        {"method": "GET", "path": "/status"}
+    )
+    print(f"{status_check} status check")
 
 
 if __name__ == "__main__":
